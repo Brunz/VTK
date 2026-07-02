@@ -1,0 +1,14 @@
+[Unit]
+Description=VTK Virtual Input Daemon
+After=rocknix-automount.service systemd-user-sessions.service
+Requires=rocknix-automount.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /storage/.config/VTK/VTKDaemon.py
+Restart=always
+RestartSec=2
+User=root
+
+[Install]
+WantedBy=multi-user.target

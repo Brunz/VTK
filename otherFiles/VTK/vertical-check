@@ -1,0 +1,61 @@
+#!/bin/sh
+LOG_FILE="/storage/.config/VTK/startVTK.log"
+
+. /etc/profile
+
+APPID="com.libretro.RetroArch"
+echo "$(date '+%H:%M:%S') - Sto eseguendo Vertical Check - ${APPID}" >> "$LOG_FILE"
+
+ARCADEROMS_XML="/usr/config/emulationstation/resources/arcaderoms.xml"
+BOTTOM_SCREEN_UI_DIR="/usr/share/lowerdeck"
+BOTTOM_SCREEN_PID_FILE="/run/lowerdeck.pid"
+
+RUNEMU_LINE=$(ps aux | grep '[r]unemu.sh' | head -n 1)
+CURRENT_CORE=$(echo "${RUNEMU_LINE}" | sed -n 's/.*--core=\([^ ]*\).*/\1/p')
+PLATFORM=$(echo "${RUNEMU_LINE}" | sed -n 's/.* -P *\([^ ]*\).*/\1/p')
+ROM_PATH=$(echo "${RUNEMU_LINE}" | sed '
+    s|.*runemu\.sh ||
+    s/\\ /__ESC_SP__/g
+    s/ .*//
+    s/__ESC_SP__/ /g
+    s/\\\(.\)/\1/g
+')
+
+if [ -z "${CURRENT_CORE}" ] || [ -z "${ROM_PATH}" ]; then
+    exit 0
+fi
+
+ROM_NAME=$(basename "${ROM_PATH}" | sed 's/\.[^.]*$//')
+EXTERNAL_DISPLAY_CONNECTED=false
+if grep -q "^connected$" /sys/class/drm/card*-HDMI*/status 2>/dev/null || grep -q "^connected$" /sys/class/drm/card*-DP*/status 2>/dev/null; then
+    EXTERNAL_DISPLAY_CONNECTED=true
+fi
+IS_VERTICAL=false
+
+case "${CURRENT_CORE}" in
+    # Unconditionally vertical
+    melonds*|desmume|vecx)
+        IS_VERTICAL=true
+        ;;
+    # Might not be vertical
+    mame*|fbneo|fbalpha*)
+        if grep -q "id=\"${ROM_NAME}\"[^>]*vert=\"true\"" "${ARCADEROMS_XML}" 2>/dev/null; then
+            IS_VERTICAL=true
+        fi
+        ;;
+esac
+
+case "${ROM_NAME}" in
+    # Also check for some specific roms that aren't marked vert
+    punchout*|spnchout*|pc_*|mp_*)
+        IS_VERTICAL=true
+        ;;
+esac
+
+echo "$(date '+%H:%M:%S') - FINE Vertical Check - ${APPID} - ${IS_VERTICAL}" >> "$LOG_FILE"
+
+if [ "${IS_VERTICAL}" = "true" ]; then
+    /storage/.config/VTK/checkVTK.sh "${APPID}" "${IS_VERTICAL}"
+else
+    /storage/.config/VTK/checkVTK.sh "${APPID}"
+fi
