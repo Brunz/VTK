@@ -33,4 +33,4 @@ VTK has been successfully tested on the following emulators and cores:
 This installation is completely non-destructive and will not overwrite any system files. To uninstall, simply delete the files you manually copied into the `/storage/.config` folder.
 
 > [!WARNING]
-> **RetroArch Virtual Controller Disruption**: Installing this project will currently disable the native RetroArch Virtual Controller. A solution to make both features coexist is still under evaluation.
+> **Virtual Console Disruption**: Installing this project will currently disable the native RetroArch Virtual Controller. A solution to make both features coexist is still under evaluation.
