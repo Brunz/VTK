@@ -1,0 +1,13 @@
+# File di salvataggio locali di Godot
+.godot/
+.import/
+export_presets.cfg
+
+# File binari di esportazione (se presenti)
+android/
+build/
+*.uid
+
+# File specifici del sistema operativo
+.DS_Store
+Thumbs.db
