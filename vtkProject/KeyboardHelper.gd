@@ -15,7 +15,7 @@ static var layouts = {
 	"base":[
 		[
 			Tasto.new("ESC", "KEY 1"), Tasto.new("F1", "KEY 59"), Tasto.new("F2", "KEY 60"), Tasto.new("F3", "KEY 61"),
-			Tasto.new("F4", "KEY 62"), Tasto.new("F5", "KEY 63"), Tasto.new("F6", "KEY 64"), Tasto.new("SLK", "KEY 70"),
+			Tasto.new("F4", "KEY 62"), Tasto.new("F5", "KEY 63"), Tasto.new("SLK", "KEY 70"), Tasto.new("✜", "DPAD"),
 			Tasto.new("□", "HOME"), Tasto.new("⌫", "KEY 14")
 		],
 		[
@@ -45,7 +45,7 @@ static var layouts = {
 	],
 	"baseShift": [
 		[
-			Tasto.new("ESC", "KEY 1"), Tasto.new("F7", "KEY 65"), Tasto.new("F8", "KEY 66"), Tasto.new("F9", "KEY 67"),
+			Tasto.new("F6", "KEY 64"), Tasto.new("F7", "KEY 65"), Tasto.new("F8", "KEY 66"), Tasto.new("F9", "KEY 67"),
 			Tasto.new("F10", "KEY 68"), Tasto.new("F11", "KEY 87"), Tasto.new("F12", "KEY 88"), Tasto.new("TAB", "KEY 15"),
 			Tasto.new("□", "HOME"), Tasto.new("⌫", "KEY 14")
 		],
@@ -179,7 +179,7 @@ static func getButtonsForPanel() -> Array[Tasto]:
 static func createButton(tasto:Tasto, hb:float, separatore:float, sensibility:int, layoutAttuale:String) -> Button:
 	var codeDark = ["KEY 57","KEY 28", "KEY 1001","KEY 59","KEY 60","KEY 61","KEY 62","KEY 63","KEY 64",
 					"KEY 65","KEY 66","KEY 14","KEY 1","KEY 1002","KEY 66","KEY 67","KEY 68","KEY 87",
-					"KEY 88","KEY 15","KEY 29","KEY 70"]
+					"KEY 88","KEY 15","KEY 29","KEY 70", "DPAD"]
 	
 	var nuovo_bottone = Button.new()
 	nuovo_bottone.text = tasto.char
@@ -190,6 +190,9 @@ static func createButton(tasto:Tasto, hb:float, separatore:float, sensibility:in
 	var stile_sfondo = StyleBoxFlat.new()
 	stile_sfondo.bg_color = Color(0.25, 0.25, 0.25, 1.0)
 	if(tasto.code in codeDark):
+		if(tasto.code == "DPAD"):
+			nuovo_bottone.set_meta("DPAD","DPAD")
+			nuovo_bottone.add_theme_font_size_override("font_size", 28)
 		stile_sfondo.bg_color = Color(0.20, 0.20, 0.20, 1.0)
 	elif (tasto.code == "KEY 1003"):
 		stile_sfondo.bg_color = Color(0.145, 0.141, 0.49, 1.0)

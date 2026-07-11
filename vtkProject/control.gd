@@ -15,11 +15,14 @@ var appID:String = ""
 
 var mouse_inizializzato : bool = false
 
+# Serve ad Intercettare i tasti del controller
+var bg_reader: BackgroundInputReader
+
 # CLOCK
 var label_orario: Label
 
 func _process(delta: float) -> void:
-	pass
+		pass
 
 func _ready():
 	# Recupera tutti gli argomenti personalizzati passati da riga di comando
@@ -54,6 +57,13 @@ func _ready():
 	
 	#self.drawKeyboard()
 	self.drawClock()
+	
+	#Istanzio il lettore passando 'self' (questo script riceverà i dati)
+	bg_reader = BackgroundInputReader.new(self)
+
+func _exit_tree():
+	if bg_reader:
+		bg_reader.set_listening(false)
 
 func _input(event: InputEvent) -> void:
 	# Se l'input proviene dal mouse (clic o movimento)
@@ -68,6 +78,7 @@ func _input(event: InputEvent) -> void:
 		if checkIfMouseIsInWindow():
 			moveMouseInWindow()
 		
+
 func _notification(what: int) -> void:
 	# Controlla anche se il mouse "entra" o "esce" dalla finestra di gioco
 	if what == NOTIFICATION_WM_MOUSE_ENTER:
@@ -132,6 +143,9 @@ func drawKeyboard():
 				else:
 					var butt = KeyboardHelper.createButton(tasto, hb, separatore, sensibility, layoutAttuale)
 					butt.pressed.connect(_on_tasto_premuto.bind(tasto, butt))
+					if butt.has_meta("DPAD") and butt.get_meta("DPAD") == "DPAD":
+						if bg_reader.is_listening == true:
+							butt.add_theme_color_override("font_color", Color.GREEN)
 					hbox_riga.add_child(butt)
 		container_verticale.add_child(hbox_riga)
 		
@@ -189,6 +203,13 @@ func _on_tasto_premuto(tasto: KeyboardHelper.Tasto, button:Button):
 		layoutAttuale = "base"
 		self.cleanKeyboard()
 		self.drawClock()
+	elif tasto.code == "DPAD":
+		if bg_reader.is_listening == true:
+			bg_reader.set_listening(false)
+			button.add_theme_color_override("font_color", Color.WHITE_SMOKE)
+		else:
+			bg_reader.set_listening(true)
+			button.add_theme_color_override("font_color", Color.GREEN)
 	else:
 		invia_comando(tasto.code)
 func _on_mouse_mosso(x: int, y:int):
@@ -391,3 +412,29 @@ func cleanClockPage():
 func _aggiorna_orario() -> void:
 	var tempo = Time.get_time_dict_from_system()
 	label_orario.text = "%02d:%02d" % [tempo.hour, tempo.minute]
+	
+# --- FUNZIONI DI RICEZIONE DEGLI INPUT ---
+# Il thread invierà automaticamente i dati qui sotto, anche se l'app è in background
+
+func _on_bg_button_event(code: int, value: int):
+	# value = 1 (Premuto), value = 0 (Rilasciato)
+	# asse 16 = Orizzontale (Sinistra / Destra)
+	match code:
+		544: # BTN_DPAD_UP fisico
+			invia_comando("KEY 103 " + str(value))
+		545: # BTN_DPAD_DOWN fisico
+			invia_comando("KEY 108 " + str(value))
+		546: # BTN_DPAD_LEFT fisico
+			invia_comando("KEY 105 " + str(value))
+		547: # BTN_DPAD_RIGHT fisico
+			invia_comando("KEY 106 " + str(value))
+	
+	if value == 1:
+		print("BACKGROUND - Tasto Hardware Premuto. Codice OS Linux: ", code)
+		# Inserisci qui le tue azioni di gioco (es: if code == 304: fai_qualcosa())
+	elif value == 0:
+		print("BACKGROUND - Tasto Hardware Rilasciato. Codice OS Linux: ", code)
+
+func _on_bg_axis_event(code: int, value: int):
+	# Gestisce il movimento delle levette analogiche e del D-Pad
+	print("BACKGROUND - Asse mosso: ", code, " Valore: ", value)

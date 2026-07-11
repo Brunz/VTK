@@ -60,15 +60,24 @@ try:
                 
                 if tipo == "KEY":
                     lista_tasti = [int(x) for x in comando[1].split("+")]
-                    for tasto in lista_tasti:
-                        send_event(1, tasto, 1)
-                    send_event(0, 0, 0) # SYN_REPORT
                     
-                    time.sleep(0.05) # Pausa interna di pressione
-                    
-                    for tasto in reversed(lista_tasti):
-                        send_event(1, tasto, 0)
-                    send_event(0, 0, 0) # SYN_REPORT
+                    # CORRETTO: Ora l'indentazione usa solo spazi ed è perfettamente allineata
+                    if len(comando) >= 3:
+                        stato = int(comando[2]) # 1 per premuto, 0 per rilasciato
+                        
+                        for tasto in lista_tasti:
+                            send_event(1, tasto, stato)
+                        send_event(0, 0, 0) # SYN_REPORT
+                    else:
+                        for tasto in lista_tasti:
+                            send_event(1, tasto, 1)
+                        send_event(0, 0, 0) # SYN_REPORT
+                        
+                        time.sleep(0.05) # Pausa interna di pressione
+                        
+                        for tasto in reversed(lista_tasti):
+                            send_event(1, tasto, 0)
+                        send_event(0, 0, 0) # SYN_REPORT
                     
                 elif tipo == "CLICK":
                     now = time.time()
