@@ -20,6 +20,7 @@ VTK has been successfully tested on the following emulators and cores:
 * **Philips CD-i** (RetroArch - `same_cdi` core)
 * **Commodore 64** (RetroArch - `Vice x64` core)
 * **Super Nintendo** (RetroArch - `Snes9x` core)
+* **PSX** (RetroArch - `SwanStation` core)
 * **ScummVM**
 * **PortMaster**
 
