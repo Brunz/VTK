@@ -8,6 +8,7 @@ var separatore: float = 5.0
 var socket = StreamPeerTCP.new()
 var connesso = false
 var sensibility:int = 1
+var isDoubleTap:bool = true
 var isTouchabs:bool = false
 # Arguments
 var canVertical:bool = false
@@ -141,7 +142,7 @@ func drawKeyboard():
 					
 					hbox_riga.add_child(buttPanel)
 				else:
-					var butt = KeyboardHelper.createButton(tasto, hb, separatore, sensibility, layoutAttuale)
+					var butt = KeyboardHelper.createButton(tasto, hb, separatore, sensibility, layoutAttuale, isDoubleTap)
 					butt.pressed.connect(_on_tasto_premuto.bind(tasto, butt))
 					hbox_riga.add_child(butt)
 		container_verticale.add_child(hbox_riga)
@@ -183,6 +184,13 @@ func _on_tasto_premuto(tasto: KeyboardHelper.Tasto, button:Button):
 		elif button.text == "S3":
 			button.text = "S1"
 			sensibility = 1
+	elif tasto.code == "TAP":
+		if isDoubleTap == true:
+			isDoubleTap = false
+			button.text = "ST"
+		else:
+			isDoubleTap = true
+			button.text = "DT"
 	elif tasto.code == "KEY 1004":
 		layoutAttuale = "touchabs"
 		self.isTouchabs = true

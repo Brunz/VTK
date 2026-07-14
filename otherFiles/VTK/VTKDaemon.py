@@ -19,6 +19,7 @@ fcntl.ioctl(fd, UI_SET_EVBIT, 1)   # EV_KEY
 for key in range(1, 249):          
     fcntl.ioctl(fd, UI_SET_KEY, key)
 fcntl.ioctl(fd, UI_SET_KEY, 272)   # Click Mouse standard (BTN_LEFT)
+fcntl.ioctl(fd, UI_SET_KEY, 273)   # CORRETTO: Registra anche il tasto destro (BTN_RIGHT)
 
 fcntl.ioctl(fd, UI_SET_EVBIT, 2)   # EV_REL (Mouse)
 fcntl.ioctl(fd, UI_SET_RELBIT, 0)  # REL_X
@@ -29,11 +30,9 @@ fcntl.ioctl(fd, UI_DEV_SETUP, setup_structure)
 fcntl.ioctl(fd, UI_DEV_CREATE, 0)
 
 def send_event(event_type, code, value):
-    # Genera il timestamp reale richiesto da Linux uinput (secondi e microsecondi)
     t = time.time()
     sec = int(t)
     usec = int((t - sec) * 1000000)
-    # Struttura standard input_event per sistemi a 64-bit (q = long long, H = unsigned short, i = int)
     ev = struct.pack('qqHHi', sec, usec, event_type, code, value)
     os.write(fd, ev)
 
@@ -43,7 +42,6 @@ server.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
 server.bind(('127.0.0.1', 65432))
 server.listen(1)
 
-# Variabile per evitare click sovrapposti troppo vicini nel tempo (Debounce)
 ultimo_click_time = 0.0
 
 try:
@@ -61,49 +59,52 @@ try:
                 if tipo == "KEY":
                     lista_tasti = [int(x) for x in comando[1].split("+")]
                     
-                    # CORRETTO: Ora l'indentazione usa solo spazi ed è perfettamente allineata
                     if len(comando) >= 3:
-                        stato = int(comando[2]) # 1 per premuto, 0 per rilasciato
-                        
+                        stato = int(comando[2])
                         for tasto in lista_tasti:
                             send_event(1, tasto, stato)
-                        send_event(0, 0, 0) # SYN_REPORT
+                        send_event(0, 0, 0)
                     else:
                         for tasto in lista_tasti:
                             send_event(1, tasto, 1)
-                        send_event(0, 0, 0) # SYN_REPORT
-                        
-                        time.sleep(0.05) # Pausa interna di pressione
-                        
+                        send_event(0, 0, 0)
+                        time.sleep(0.05)
                         for tasto in reversed(lista_tasti):
                             send_event(1, tasto, 0)
-                        send_event(0, 0, 0) # SYN_REPORT
+                        send_event(0, 0, 0)
                     
                 elif tipo == "CLICK":
                     now = time.time()
-                    # Protezione: ignora il click se l'ultimo è avvenuto meno di 150ms fa
                     if now - ultimo_click_time < 0.15:
                         continue
                     ultimo_click_time = now
 
-                    # Rimosse le coordinate relative (2,0,0) inutili se non c'è movimento
                     send_event(1, 272, 1) # BTN_LEFT Down
-                    send_event(0, 0, 0)   # SYN_REPORT
-                    
-                    time.sleep(0.05)      # Tempo di pressione realistico (50ms)
-                    
+                    send_event(0, 0, 0)   
+                    time.sleep(0.05)      
                     send_event(1, 272, 0) # BTN_LEFT Up
-                    send_event(0, 0, 0)   # SYN_REPORT
-                    
-                    # Pausa di sicurezza post-click per stabilizzare il sistema operativo
+                    send_event(0, 0, 0)   
+                    time.sleep(0.05)
+
+                elif tipo == "DOUBLE_CLICK": # CORRETTO: Tabulazioni rimosse, allineato perfettamente
+                    now = time.time()
+                    if now - ultimo_click_time < 0.15:
+                        continue
+                    ultimo_click_time = now
+
+                    send_event(1, 273, 1) # BTN_RIGHT Down
+                    send_event(0, 0, 0)   
+                    time.sleep(0.05)      
+                    send_event(1, 273, 0) # BTN_RIGHT Up
+                    send_event(0, 0, 0)   
                     time.sleep(0.05)
 
                 elif tipo == "MOUSE":
                     x = int(comando[1])
                     y = int(comando[2])
-                    send_event(2, 0, x)   # REL_X
-                    send_event(2, 1, y)   # REL_Y
-                    send_event(0, 0, 0)   # SYN_REPORT
+                    send_event(2, 0, x)   
+                    send_event(2, 1, y)   
+                    send_event(0, 0, 0)   
         except Exception:
             pass
         finally:

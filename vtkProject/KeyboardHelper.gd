@@ -88,7 +88,7 @@ static var layouts = {
 	"touchpad": [
 		[
 			Tasto.new("T/K", "KEY 1001"), Tasto.new("F1", "KEY 59"), Tasto.new("F2", "KEY 60"), Tasto.new("F3", "KEY 61"),
-			Tasto.new("F4", "KEY 62"), Tasto.new("SP", "KEY 57"), Tasto.new("↵", "KEY 28"),  Tasto.new("⌫", "KEY 14"),
+			Tasto.new("F4", "KEY 62"), Tasto.new("SP", "KEY 57"), Tasto.new("↵", "KEY 28"),  Tasto.new("ST", "TAP"),
 			Tasto.new("S1", "KEY 1003"), Tasto.new("AB", "KEY 1004")
 		],
 		[
@@ -176,7 +176,7 @@ static func getButtonsForPanel() -> Array[Tasto]:
 	return [Tasto.new("T/K", "KEY 1001"), Tasto.new("F1", "KEY 59"), Tasto.new("F2", "KEY 60"),
 			 Tasto.new("SP", "KEY 57"), Tasto.new("↵", "KEY 28"), Tasto.new("RE", "KEY 1006")]
 	
-static func createButton(tasto:Tasto, hb:float, separatore:float, sensibility:int, layoutAttuale:String) -> Button:
+static func createButton(tasto:Tasto, hb:float, separatore:float, sensibility:int, layoutAttuale:String, isDoubleTap:bool = true) -> Button:
 	var codeDark = ["KEY 57","KEY 28", "KEY 1001","KEY 59","KEY 60","KEY 61","KEY 62","KEY 63","KEY 64",
 					"KEY 65","KEY 66","KEY 14","KEY 1","KEY 1002","KEY 66","KEY 67","KEY 68","KEY 87",
 					"KEY 88","KEY 15","KEY 29","KEY 70", "DPAD"]
@@ -200,6 +200,13 @@ static func createButton(tasto:Tasto, hb:float, separatore:float, sensibility:in
 			nuovo_bottone.text = "S2"
 		elif(sensibility == 3):
 			nuovo_bottone.text = "S3"
+	elif (tasto.code == "TAP"):
+		stile_sfondo.bg_color = Color(0.145, 0.141, 0.49, 1.0)
+		if(isDoubleTap == true):
+			nuovo_bottone.text = "DT"
+		else:
+			nuovo_bottone.text = "ST"
+		
 	elif (tasto.code == "KEY 1004" or tasto.code == "KEY 1006"):
 		stile_sfondo.bg_color = Color(0.061, 0.245, 0.175, 1.0)
 	elif (tasto.code == "KEY 1010"):
