@@ -143,9 +143,6 @@ func drawKeyboard():
 				else:
 					var butt = KeyboardHelper.createButton(tasto, hb, separatore, sensibility, layoutAttuale)
 					butt.pressed.connect(_on_tasto_premuto.bind(tasto, butt))
-					if butt.has_meta("DPAD") and butt.get_meta("DPAD") == "DPAD":
-						if bg_reader.is_listening == true:
-							butt.add_theme_color_override("font_color", Color.GREEN)
 					hbox_riga.add_child(butt)
 		container_verticale.add_child(hbox_riga)
 		
@@ -203,13 +200,6 @@ func _on_tasto_premuto(tasto: KeyboardHelper.Tasto, button:Button):
 		layoutAttuale = "base"
 		self.cleanKeyboard()
 		self.drawClock()
-	elif tasto.code == "DPAD":
-		if bg_reader.is_listening == true:
-			bg_reader.set_listening(false)
-			button.add_theme_color_override("font_color", Color.WHITE_SMOKE)
-		else:
-			bg_reader.set_listening(true)
-			button.add_theme_color_override("font_color", Color.GREEN)
 	else:
 		invia_comando(tasto.code)
 func _on_mouse_mosso(x: int, y:int):
@@ -305,14 +295,20 @@ func drawButtonsClock():
 	contenitore_bottoni.position.y -= 100
 
 	contenitore_bottoni.add_theme_constant_override("separation", 20)
+	
+	var imgArrows = "arrowsOff.png";
+	if bg_reader != null && bg_reader.is_listening == true:
+		imgArrows = "arrowsOn.png";
+		
 
 	var icons = [["keyboard.png", Color(1.0, 1.0, 1.0, 0.7), 50, "keyb"],
 				["touch.png", Color(1.0, 1.0, 1.0, 0.7), 50, "touch"],
 				["tate.png", Color(1.0, 1.0, 1.0, 0.7), 50, "tate"],
+				[imgArrows, Color(1.0, 1.0, 1.0, 0.7), 50, "arrows"],
 				["power.png", Color(0.623, 0.075, 0.059, 0.9), 50, "power"]]
 
 	var index = 0
-	for i in range(4):
+	for i in range(5):
 		var bottone = self.getButtonHome(icons[i])
 		if(index == 2):
 			if self.canVertical == false or appID == "":
@@ -336,7 +332,7 @@ func getButtonHome(icons:Array) -> Button:
 	bottone.add_theme_color_override("icon_disabled_color", Color(1.0, 1.0, 1.0, 0.2))
 	bottone.add_theme_color_override("icon_normal_color", icons[1])
 	bottone.icon_alignment = HorizontalAlignment.HORIZONTAL_ALIGNMENT_CENTER
-	bottone.pressed.connect(_on_bottone_premuto.bind(icons[3]))
+	bottone.pressed.connect(_on_bottone_premuto.bind(icons[3], bottone))
 	bottone.icon = texture_icona
 	bottone.material = CanvasItemMaterial.new()
 		
@@ -363,7 +359,7 @@ func drawButtonTate():
 		# Aggiunge il bottone al contenitore
 		contenitore_bottoni.add_child(bottone)
 	
-func _on_bottone_premuto(key: String) -> void:
+func _on_bottone_premuto(key: String, button:Button) -> void:
 	if key == "keyb":
 		layoutAttuale = "base"
 		self.cleanClockPage()
@@ -404,6 +400,15 @@ func _on_bottone_premuto(key: String) -> void:
 		get_tree().quit()
 	elif key == "powertate":
 		get_tree().quit()
+	elif key == "arrows":
+		if bg_reader.is_listening == true:
+			bg_reader.set_listening(false)
+			var texture_icona = load("res://arrowsOff.png")
+			button.icon = texture_icona
+		else:
+			bg_reader.set_listening(true)
+			var texture_icona = load("res://arrowsOn.png")
+			button.icon = texture_icona
 func cleanClockPage():
 	for figlio in get_children():
 		if figlio != container_verticale:

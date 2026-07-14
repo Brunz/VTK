@@ -15,7 +15,7 @@ static var layouts = {
 	"base":[
 		[
 			Tasto.new("ESC", "KEY 1"), Tasto.new("F1", "KEY 59"), Tasto.new("F2", "KEY 60"), Tasto.new("F3", "KEY 61"),
-			Tasto.new("F4", "KEY 62"), Tasto.new("F5", "KEY 63"), Tasto.new("SLK", "KEY 70"), Tasto.new("✜", "DPAD"),
+			Tasto.new("F4", "KEY 62"), Tasto.new("F5", "KEY 63"), Tasto.new("F6", "KEY 64"), Tasto.new("SLK", "KEY 70"),
 			Tasto.new("□", "HOME"), Tasto.new("⌫", "KEY 14")
 		],
 		[
@@ -45,7 +45,7 @@ static var layouts = {
 	],
 	"baseShift": [
 		[
-			Tasto.new("F6", "KEY 64"), Tasto.new("F7", "KEY 65"), Tasto.new("F8", "KEY 66"), Tasto.new("F9", "KEY 67"),
+			Tasto.new("ESC", "KEY 1"), Tasto.new("F7", "KEY 65"), Tasto.new("F8", "KEY 66"), Tasto.new("F9", "KEY 67"),
 			Tasto.new("F10", "KEY 68"), Tasto.new("F11", "KEY 87"), Tasto.new("F12", "KEY 88"), Tasto.new("TAB", "KEY 15"),
 			Tasto.new("□", "HOME"), Tasto.new("⌫", "KEY 14")
 		],
