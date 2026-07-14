@@ -12,6 +12,10 @@ This lightweight project was developed and tested exclusively on **ROCKNIX** for
 > [!NOTE]
 > Running this project on other dual-screen handheld devices will require manual modifications and adaptations.
 
+## New features:
+* Enable/disable keyboard arrow emulation via the DPad
+* Enable/disable double-tap (emulates the right mouse button)
+
 ## Tested Emulators
 
 VTK has been successfully tested on the following emulators and cores:
