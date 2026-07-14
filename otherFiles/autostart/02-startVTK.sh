@@ -2,11 +2,45 @@
 
 LOG_FILE="/storage/.config/VTK/startVTK.log"
 SWAY_CONFIG="/storage/.config/sway/config"
+SERVICE_NAME="vtkdaemon"
 
 mount --bind /storage/.config/VTK/vertical-check /usr/bin/vertical-check
 
+check_service() {
+    if systemctl is-active --quiet "$1"; then
+        return 0 # Service OK
+    else
+        return 1 # Service KO
+    fi
+}
+
+check_installation() {
+    rm -f "$LOG_FILE"
+    echo "$(date '+%H:%M:%S') - Check Installation..." >> "$LOG_FILE"
+    if check_service "$SERVICE_NAME"; then
+	echo "$(date '+%H:%M:%S') - The serice $SERVICE_NAME is active" >> "$LOG_FILE"
+    else
+	echo "$(date '+%H:%M:%S') - The service $SERVICE_NAME is inactive" >> "$LOG_FILE"
+
+	cp /storage/.config/VTK/vtkdaemon.service /storage/.config/system.d/
+	chmod +x /storage/.config/VTK/VTKDaemon.py
+	systemctl daemon-reload
+	systemctl enable --now vtkdaemon
+
+	echo "$(date '+%H:%M:%S') - Service installed and enabled" >> "$LOG_FILE"
+
+	chmod +x /storage/.config/VTK/changeDisplayCalibrationMatrix.sh
+	chmod +x /storage/.config/VTK/checkVTK.sh
+	chmod +x /storage/.config/VTK/launchFilter.sh
+	chmod +x /storage/.config/VTK/vertical-check
+	chmod +x /storage/.config/VTK/vtk
+    fi
+}
+
 run_config() {    
-    echo "$(date '+%H:%M:%S') - Attesa Sway..." >> "$LOG_FILE"
+    check_installation
+
+    echo "$(date '+%H:%M:%S') - Waiting Sway..." >> "$LOG_FILE"
     while ! swaymsg -t get_outputs >/dev/null 2>&1; do
         sleep 0.5
     done

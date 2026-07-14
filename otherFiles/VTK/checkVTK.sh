@@ -23,7 +23,7 @@ avvia_VTK() {
 
     # Assicuriamoci che lo schermo inferiore sia alimentato
     swaymsg "output ${OUTPUT} power on" >/dev/null 2>&1
-
+    
     # Avviamo VTK ereditando l'ambiente grafico di Sway senza export manuali
     if [ "${canVertical}" = "true" ]; then
         echo "$(date '+%H:%M:%S') - Eseguo VTK - ${appID} - canVertical is true" >> "$LOG_FILE"
