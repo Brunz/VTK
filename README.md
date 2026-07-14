@@ -27,7 +27,8 @@ VTK has been successfully tested on the following emulators and cores:
 ## Simple Installation
 
 1. Connect to your console or insert its SD card into your computer.
-2. Copy the entire contents of the `otherFiles` folder into the `/storage/.config` directory on your console.
+2. copy the 2 folders inside `otherFiles` into `/storage/.config`
+3. make sure the file inside autostart has permissions to be executed `chmod +x /storage/.config/autostart/02-startVTK.sh`
 3. Restart the console.
 
 ### Uninstallation
